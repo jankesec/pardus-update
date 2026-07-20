@@ -1160,11 +1160,11 @@ class MainWindow(object):
         start, end = self.ui_distupgrade_textview.get_buffer().get_bounds()
         self.ui_distupgrade_textview.get_buffer().delete(start, end)
 
-        ask_conf = ""
+        ask_conf = "new"
         if self.ui_distupgradenewconf_radiobutton.get_active():
-            ask_conf = "--force-confnew"
+            ask_conf = "new"
         elif self.ui_distupgradeoldconf_radiobutton.get_active():
-            ask_conf = "--force-confold"
+            ask_conf = "old"
 
         print("dpkg_conf: {}".format(ask_conf))
 

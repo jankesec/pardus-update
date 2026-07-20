@@ -319,6 +319,14 @@ def main():
         #     except Exception as e:
         #         print("Failed to delete {}. Reason: {}".format(file_path, e))
 
+        if askconf == "new":
+            askconf_arg = "--force-confnew"
+        elif askconf == "old":
+            askconf_arg = "--force-confold"
+        else:
+            print("Invalid enum for askconf. Aborting.", file=sys.stderr)
+            sys.exit(1)
+
         app_safeupgrade_path = os.path.dirname(os.path.abspath(__file__)) + "/../data/pardus-safeupgrade-template.sh"
         safeupgrade_path = os.path.dirname(os.path.abspath(__file__)) + "/../data/pardus-safeupgrade.sh"
 
@@ -331,7 +339,7 @@ def main():
 
             with open(app_safeupgrade_path, "r") as app_safeupgrade_file:
                 contents = app_safeupgrade_file.read()
-                new_contents = contents.replace("@@askconf@@", askconf)
+                new_contents = contents.replace("@@askconf@@", askconf_arg)
 
             # create new safe upgrade script from template
             usp = open(safeupgrade_path, "w")
