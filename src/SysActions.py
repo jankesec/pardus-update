@@ -106,6 +106,11 @@ def main():
                         env={**os.environ, 'DEBIAN_FRONTEND': 'noninteractive'})
 
     def controldistupgrade(sourceslist):
+
+        if not is_safe_sources(sourceslist):
+            print("Malicious apt source detected. Execution aborted.", file=sys.stderr)
+            sys.exit(1)
+
         sfile = open("/tmp/tmp-sources.list", "w")
         sfile.write(sourceslist)
         sfile.flush()
