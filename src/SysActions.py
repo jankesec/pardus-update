@@ -510,6 +510,11 @@ def main():
             subupdate()
 
     def set_source_state(state, line, file_path):
+
+        if state not in ("0", "1"):
+            print("Invalid state parameter.", file=sys.stderr)
+            sys.exit(1)
+
         print("{}\n\nold: {}\n".format(file_path, line))
         sources = aptsourceslist.SourcesList()
         for source in sources.list:
