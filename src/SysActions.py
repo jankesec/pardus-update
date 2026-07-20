@@ -117,9 +117,37 @@ def main():
                         env={**os.environ, 'DEBIAN_FRONTEND': 'noninteractive'})
 
     def removeresidual(packages):
-        packagelist = packages.split(" ")
-        subprocess.call(["apt", "remove", "--purge", "-yq"] + packagelist,
-                        env={**os.environ, 'DEBIAN_FRONTEND': 'noninteractive'})
+
+        try:
+            valid_packages = parse_packages(packages)
+        except ValueError as e:
+            print(f"SECURITY ALERT: {e}", file=sys.stderr)
+            sys.exit(1)
+
+        if not valid_packages:
+            print("No packages to remove.", file=sys.stdout)
+            sys.exit(0)
+
+        try:
+            cache = apt.Cache()
+            cache.open()
+        except Exception as e:
+            print(f"Could not open apt cache. Aborting. Error: {e}", file=sys.stderr)
+            sys.exit(1)
+
+        verified_residuals = []
+        for pkg in valid_packages:
+            if pkg in cache:
+                if cache[pkg].has_config_files and not cache[pkg].is_installed:
+                    verified_residuals.append(pkg)
+                else:
+                    print(f"Package '{pkg}' is not in residual state.", file=sys.stderr)
+            else:
+                print(f"Package '{pkg}' not found in apt cache.", file=sys.stderr)
+
+        if verified_residuals:
+            subprocess.call(["apt", "remove", "--purge", "-yq"] + verified_residuals,
+                            env={**os.environ, 'DEBIAN_FRONTEND': 'noninteractive'})
 
     def removeauto():
         subprocess.call(["apt", "autoremove", "-yq"],
