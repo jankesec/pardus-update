@@ -276,6 +276,10 @@ def main():
 
     def downupgrade(sourceslist):
 
+        if not is_safe_sources(sourceslist):
+            print("Malicious apt source detected. Execution aborted.", file=sys.stderr)
+            sys.exit(1)
+
         aptclean()
 
         sfile = open("/tmp/tmp-sources.list", "w")
