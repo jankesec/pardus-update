@@ -57,7 +57,7 @@ def main():
         subprocess.call(["apt", "update"],
                         env={**os.environ, 'DEBIAN_FRONTEND': 'noninteractive'})
 
-    def subupgrade(yq, dpkg_conf, keeps=None):
+    def subupgrade(yq_state, dpkg_conf_state, keeps=None):
         lock, msg = control_lock()
         if not lock:
             if "E:" in msg and "/var/lib/dpkg/lock-frontend" in msg:
@@ -67,19 +67,39 @@ def main():
                 print("dpkg interrupt error", file=sys.stderr)
                 sys.exit(12)
 
-        if keeps:
-            keep_list = keeps.split(" ")
-            for kp in keep_list:
+        if yq_state == "yes":
+            yq_args = ["-y", "-q"]
+        elif yq_state == "ask":
+            yq_args = []
+        else:
+            print("Invalid enum for yq_state. Aborting.", file=sys.stderr)
+            sys.exit(1)
+
+        if dpkg_conf_state == "new":
+            dpkg_args = ["-o", "Dpkg::Options::=--force-confnew"]
+        elif dpkg_conf_state == "old":
+            dpkg_args = ["-o", "Dpkg::Options::=--force-confold"]
+        elif dpkg_conf_state == "ask":
+            dpkg_args = []
+        else:
+            print("Invalid enum for dpkg_conf_state. Aborting.", file=sys.stderr)
+            sys.exit(1)
+
+        try:
+            valid_keeps = parse_packages(keeps)
+        except ValueError as e:
+            print(f"Security Alert: {e}", file=sys.stderr)
+            sys.exit(1)
+
+        if valid_keeps:
+            for kp in valid_keeps:
                 subprocess.call(["apt-mark", "hold", kp])
 
-        dpkg_conf_list = dpkg_conf.split(" ")
-        yq_list = yq.split(" ")
-        result = subprocess.run(["apt", "full-upgrade"] + yq_list + dpkg_conf_list,
+        result = subprocess.run(["apt", "full-upgrade"] + yq_args + dpkg_args,
                                 env={**os.environ, "DEBIAN_FRONTEND": "noninteractive"})
 
-        if keeps:
-            keep_list = keeps.split(" ")
-            for kp in keep_list:
+        if valid_keeps:
+            for kp in valid_keeps:
                 subprocess.call(["apt-mark", "unhold", kp])
 
         sys.exit(result.returncode)
@@ -557,6 +577,27 @@ def main():
                     return False
 
         return True
+
+    def parse_packages(packages):
+        if not packages or not packages.strip():
+            return []
+
+        packagelist = packages.split()
+        valid_packages = []
+
+        package_re = re.compile(r'^[a-z0-9][a-z0-9+.-]+(?::[a-z0-9]+)?$')
+
+        for item in packagelist:
+            item = item.strip()
+            if not item:
+                continue
+
+            if package_re.fullmatch(item):
+                valid_packages.append(item)
+            else:
+                raise ValueError(f"Invalid package name detected: '{item}'")
+
+        return valid_packages
 
 
     if len(sys.argv) > 1:

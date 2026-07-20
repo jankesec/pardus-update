@@ -788,21 +788,19 @@ class MainWindow(object):
 
         self.ui_upgradeinfook_button.set_visible(False)
 
-        yq_conf = ""
+        yq_state = "ask"
         if self.ui_upgradewithyq_radiobutton.get_active():
-            yq_conf = "-y -q"
+            yq_state = "yes"
         elif self.ui_upgradewithoutyq_radiobutton.get_active():
-            yq_conf = ""
+            yq_state = "ask"
 
-        dpkg_conf = ""
+        dpkg_conf_state = "ask"
         if self.ui_upgradenewconf_radiobutton.get_active():
-            dpkg_conf = "-o Dpkg::Options::=--force-confnew"
+            dpkg_conf_state = "new"
         elif self.ui_upgradeoldconf_radiobutton.get_active():
-            dpkg_conf = "-o Dpkg::Options::=--force-confold"
-        elif self.ui_upgradeaskconf_radiobutton.get_active():
-            dpkg_conf = ""
+            dpkg_conf_state = "old"
 
-        print("yq_conf: {}\ndpkg_conf: {}".format(yq_conf, dpkg_conf))
+        print("yq_state: {}\ndpkg_conf_state: {}".format(yq_state, dpkg_conf_state))
         if not self.upgrade_inprogress:
             self.ui_upgradeinfo_label.set_markup(
                 "<b>{}</b>".format(_("Updates are installing. Please wait...")))
@@ -810,7 +808,7 @@ class MainWindow(object):
             self.item_systemstatus.set_label(_("Updating"))
 
             command = ["/usr/bin/pkexec", os.path.dirname(os.path.abspath(__file__)) + "/SysActions.py",
-                       "upgrade", yq_conf, dpkg_conf, " ".join(self.user_keep_list)]
+                       "upgrade", yq_state, dpkg_conf_state, " ".join(self.user_keep_list)]
             self.upgrade_vte_start_process(command)
             self.upgrade_inprogress = True
         else:
