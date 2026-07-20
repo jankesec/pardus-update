@@ -443,35 +443,6 @@ def main():
         else:
             print("{} file not exists.".format(app_safeupgrade_path))
 
-    def distupgrade(sourceslist):
-        sdir = "/etc/apt/sources.list.d"
-        if os.path.isdir(sdir):
-            slistd = os.listdir(sdir)
-            for slist in slistd:
-                commented = ""
-                if slist.endswith(".list"):
-                    try:
-                        with open(os.path.join(sdir, slist), "r") as sread:
-                            for line in sread.readlines():
-                                commented += "#{}".format(line)
-                        with open(os.path.join(sdir, slist), "w") as swrite:
-                            swrite.writelines(commented)
-                            swrite.flush()
-                            swrite.close()
-                    except Exception as e:
-                        print("{}".format(e))
-
-        sfile = open("/etc/apt/sources.list", "w")
-        sfile.write(sourceslist)
-        sfile.flush()
-        sfile.close()
-
-        rmtree("/var/lib/apt/lists/", ignore_errors=True)
-        subupdate()
-
-        subprocess.call(["apt", "full-upgrade", "-fuyq", "--no-download"],
-                        env={**os.environ, 'DEBIAN_FRONTEND': 'noninteractive'})
-
     def aptclear(clean, autoremove, aptlists):
         print(clean)
         print(autoremove)
@@ -596,8 +567,6 @@ def main():
             controldistupgrade(sys.argv[2])
         elif sys.argv[1] == "downupgrade":
             downupgrade(sys.argv[2])
-        elif sys.argv[1] == "distupgrade":
-            distupgrade(sys.argv[2])
         elif sys.argv[1] == "distupgradeoffline":
             distupgradeoffline(sys.argv[2], sys.argv[3])
         elif sys.argv[1] == "dpkgconfigure":
