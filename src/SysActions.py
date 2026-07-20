@@ -528,6 +528,17 @@ def main():
         subupdate()
 
     def fix_sources(slist_content, fix_slistd, slistd_remove, configure_state, fixbroken_state):
+
+        allowed_flags = {"0", "1"}
+        if not (fix_slistd in allowed_flags and slistd_remove in allowed_flags and
+                configure_state in allowed_flags and fixbroken_state in allowed_flags):
+            print("Invalid state flags provided. Aborting.", file=sys.stderr)
+            sys.exit(1)
+
+        if not is_safe_sources(slist_content):
+            print("Malicious apt source detected. Execution aborted.", file=sys.stderr)
+            sys.exit(1)
+
         print("{}:\n\n{}".format(_("New Sources List"), slist_content))
         print("{}: {}\n".format(_("Fix sources.list.d"), fix_slistd))
         if fix_slistd == "1":
