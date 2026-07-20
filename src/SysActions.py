@@ -20,6 +20,7 @@ import apt
 import apt_pkg
 from aptsources import sourceslist as aptsourceslist
 import distro
+import re
 
 import locale
 from locale import gettext as _
@@ -319,6 +320,10 @@ def main():
         #     except Exception as e:
         #         print("Failed to delete {}. Reason: {}".format(file_path, e))
 
+        if not is_safe_sources(sourceslist):
+            print("Malicious apt source detected. Execution aborted.", file=sys.stderr)
+            sys.exit(1)
+
         if askconf == "new":
             askconf_arg = "--force-confnew"
         elif askconf == "old":
@@ -545,6 +550,33 @@ def main():
             fixbroken()
         else:
             print(_("fixbroken skipped per user request."))
+
+    def is_safe_sources(sources_text):
+        if not sources_text or not str(sources_text).strip():
+            return False
+
+        blacklisted_terms = [
+            "trusted=yes", "trusted=true",
+            "allow-insecure",
+            "signed-by=",
+            "file://", "copy://", "cdrom://"
+        ]
+
+        for line in str(sources_text).splitlines():
+
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+
+            if not re.match(r"^deb(-src)?\s+", line):
+                return False
+
+            compact_line = line.lower().replace(" ", "")
+            for term in blacklisted_terms:
+                if term.replace(" ", "") in compact_line:
+                    return False
+
+        return True
 
 
     if len(sys.argv) > 1:
