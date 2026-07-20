@@ -50,6 +50,7 @@ desktop_env = f"{getenv('SESSION')} {getenv('XDG_CURRENT_DESKTOP')}"
 
 xfce_desktop = "xfce" in desktop_env
 kde_desktop = "kde" in desktop_env
+gnome_desktop = "gnome" in desktop_env
 
 ICONS_PARDUS = {
     "available": "pardus-update-available-symbolic",
