@@ -1,3 +1,35 @@
+pardus-update (0.7.0) unstable; urgency=medium
+
+  [ Hugo Carvalho ]
+  * Update Portuguese translations
+
+  [ Kerem Durgut ]
+  * fix kde app icons
+  * fix the notification metadata in KDE
+
+  [ Fatih Altun ]
+  * Update app icon selection logic
+  * Add validation for offline upgrade dpkg conf option
+  * Add missing gnome_desktop var
+  * Add validation for offline upgrade sources list content
+  * Add validation for download upgrades sources list content
+  * Fix residual distupgrade func
+  * Add validation for control dist upgrade sources list content
+  * Add validation for dpkg confs and marked package names on upgrade
+  * Add validation for residual package names
+  * Add validation for source list and flag on fix_sources
+  * Add validation for state control on set_source_state
+  * Separate apt source actions from base apt system actions
+  * Add AptSourceActions to po/files
+  * Update pot file
+  * Update Turkish translations
+  * Add AptSourceActions policy
+  * Update autoaptupdate allow_any value
+  * Update systemsettingswrite allow_any value
+  * Update translations
+
+ -- Fatih Altun <fatih.altun@pardus.org.tr>  Tue, 21 Jul 2026 18:26:32 +0300
+
 pardus-update (0.6.6) unstable; urgency=medium
 
   * Fix repo dist control url
