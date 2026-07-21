@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-05 21:16+0300\n"
+"POT-Creation-Date: 2026-07-21 18:26+0300\n"
 "PO-Revision-Date: 2026-03-31 14:35+0100\n"
 "Last-Translator: Hugo Carvalho <hugokarvalho@hotmail.com>\n"
 "Language-Team: \n"
@@ -18,8 +18,8 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.9\n"
 
-#: ui/MainWindow.glade:13 ui/MainWindow.glade:5156 src/MainWindow.py:95
-#: src/MainWindow.py:675 src/MainWindow.py:1926 src/MainWindow.py:2649
+#: ui/MainWindow.glade:13 ui/MainWindow.glade:5156 src/MainWindow.py:113
+#: src/MainWindow.py:633 src/MainWindow.py:2667
 msgid "Pardus Update"
 msgstr "Atualização Pardus"
 
@@ -132,7 +132,7 @@ msgstr "Corrigir"
 msgid "Your system is up to date."
 msgstr "O sistema está atualizado."
 
-#: ui/MainWindow.glade:1289 src/MainWindow.py:679
+#: ui/MainWindow.glade:1289 src/MainWindow.py:637
 msgid "Check Updates"
 msgstr "Procurar por atualizações"
 
@@ -141,8 +141,8 @@ msgid "Pardus new version is available."
 msgstr "Está disponível uma nova versão do Pardus."
 
 #: ui/MainWindow.glade:1442 ui/MainWindow.glade:3163 ui/MainWindow.glade:3593
-#: src/MainWindow.py:753 src/MainWindow.py:1113 src/MainWindow.py:1265
-#: src/MainWindow.py:1363
+#: src/MainWindow.py:711 src/MainWindow.py:1069 src/MainWindow.py:1221
+#: src/MainWindow.py:1319
 msgid "Home Page"
 msgstr "Página inicial"
 
@@ -194,7 +194,7 @@ msgstr "Cache do Gestor de Pacotes"
 msgid "APT Sources List"
 msgstr "Lista de fontes APT"
 
-#: ui/MainWindow.glade:1920 src/MainWindow.py:1329
+#: ui/MainWindow.glade:1920 src/MainWindow.py:1285
 msgid "Enable Passwordless Usage"
 msgstr "Ativar a utilização sem palavra-passe"
 
@@ -386,7 +386,7 @@ msgstr "está livre de"
 msgid "Retry"
 msgstr "Repetir"
 
-#: ui/MainWindow.glade:4456 src/MainWindow.py:1174
+#: ui/MainWindow.glade:4456 src/MainWindow.py:1130
 msgid "Packages are downloading, please wait."
 msgstr "Os pacotes estão a ser descarregados, aguarde."
 
@@ -429,16 +429,16 @@ msgstr "Procurar atualizações novamente"
 msgid "Try Fix Sources List"
 msgstr "Tentar corrigir a lista de fontes"
 
-#: ui/MainWindow.glade:5238 src/MainWindow.py:293 src/MainWindow.py:699
-#: src/MainWindow.py:780 src/MainWindow.py:982 src/MainWindow.py:1116
-#: src/MainWindow.py:1241 src/MainWindow.py:1261 src/MainWindow.py:1368
-#: src/MainWindow.py:1388
+#: ui/MainWindow.glade:5238 src/MainWindow.py:272 src/MainWindow.py:657
+#: src/MainWindow.py:738 src/MainWindow.py:938 src/MainWindow.py:1072
+#: src/MainWindow.py:1197 src/MainWindow.py:1217 src/MainWindow.py:1324
+#: src/MainWindow.py:1344
 msgid "Settings"
 msgstr "Definições"
 
-#: ui/MainWindow.glade:5294 src/MainWindow.py:295 src/MainWindow.py:757
-#: src/MainWindow.py:782 src/MainWindow.py:791 src/MainWindow.py:1243
-#: src/MainWindow.py:1270 src/MainWindow.py:1355 src/MainWindow.py:1391
+#: ui/MainWindow.glade:5294 src/MainWindow.py:274 src/MainWindow.py:715
+#: src/MainWindow.py:740 src/MainWindow.py:749 src/MainWindow.py:1199
+#: src/MainWindow.py:1226 src/MainWindow.py:1311 src/MainWindow.py:1347
 msgid "Version Upgrade"
 msgstr "Atualização da versão"
 
@@ -476,71 +476,71 @@ msgstr "Iniciar processo (com a opção -yq)"
 msgid "Ask me before starting the process (without -yq)"
 msgstr "Perguntar antes de iniciar o processo (sem -yq)"
 
-#: src/MainWindow.py:99
+#: src/MainWindow.py:117
 msgid "About Pardus Update"
 msgstr "Acerca do Atualização Pardus"
 
-#: src/MainWindow.py:179 src/MainWindow.py:180
+#: src/MainWindow.py:195 src/MainWindow.py:196
 msgid "Start {} Upgrade"
 msgstr "Iniciar a atualização {}"
 
-#: src/MainWindow.py:299 src/MainWindow.py:725 src/MainWindow.py:742
-#: src/MainWindow.py:763 src/MainWindow.py:786
+#: src/MainWindow.py:278 src/MainWindow.py:683 src/MainWindow.py:700
+#: src/MainWindow.py:721 src/MainWindow.py:744
 msgid "Hide App"
 msgstr "Ocultar aplicação"
 
-#: src/MainWindow.py:690
+#: src/MainWindow.py:648
 msgid "Quit"
 msgstr "Sair"
 
-#: src/MainWindow.py:695 src/MainWindow.py:1826
+#: src/MainWindow.py:653 src/MainWindow.py:1786
 msgid "Last Check"
 msgstr "Última verificação"
 
-#: src/MainWindow.py:703 src/MainWindow.py:1899
+#: src/MainWindow.py:661 src/MainWindow.py:1849
 msgid "System is Up to Date"
 msgstr "O sistema está atualizado"
 
-#: src/MainWindow.py:727 src/MainWindow.py:739 src/MainWindow.py:1583
+#: src/MainWindow.py:685 src/MainWindow.py:697 src/MainWindow.py:1539
 msgid "Show App"
 msgstr "Mostrar aplicação"
 
-#: src/MainWindow.py:850
+#: src/MainWindow.py:806
 msgid "Updates are installing. Please wait..."
 msgstr "As atualizações estão a ser instaladas. Aguarde..."
 
-#: src/MainWindow.py:852
+#: src/MainWindow.py:808
 msgid "Updating"
 msgstr "A atualizar"
 
-#: src/MainWindow.py:878 src/MainWindow.py:904
+#: src/MainWindow.py:834 src/MainWindow.py:860
 msgid "Packages are removing. Please wait..."
 msgstr "Os pacotes estão a ser removidos. Aguarde..."
 
-#: src/MainWindow.py:971 src/MainWindow.py:1069 src/MainWindow.py:1078
-#: src/MainWindow.py:1098 src/MainWindow.py:1510 src/MainWindow.py:2765
+#: src/MainWindow.py:927 src/MainWindow.py:1025 src/MainWindow.py:1034
+#: src/MainWindow.py:1054 src/MainWindow.py:1466 src/MainWindow.py:2646
 msgid "Error"
 msgstr "Erro"
 
-#: src/MainWindow.py:971 src/MainWindow.py:1069 src/MainWindow.py:1098
+#: src/MainWindow.py:927 src/MainWindow.py:1025 src/MainWindow.py:1054
 msgid "Package manager is busy, try again after the process is completed."
 msgstr ""
 "O gestor de pacotes está ocupado. Tente novamente depois de o processo estar "
 "concluído."
 
-#: src/MainWindow.py:1013
+#: src/MainWindow.py:969
 msgid "The default sources list is as follows."
 msgstr "A lista de fontes predefinida é a seguinte."
 
-#: src/MainWindow.py:1078 src/MainWindow.py:1510
+#: src/MainWindow.py:1034 src/MainWindow.py:1466
 msgid "Your system is not supported."
 msgstr "O seu sistema não é suportado."
 
-#: src/MainWindow.py:1327
+#: src/MainWindow.py:1283
 msgid "Disable Passwordless Usage"
 msgstr "Desativar a utilização sem palavra-passe"
 
-#: src/MainWindow.py:1535 src/MainWindow.py:2339
+#: src/MainWindow.py:1491 src/MainWindow.py:2270
 msgid ""
 "dpkg interrupt detected. Click the 'Fix' button or\n"
 "manually run 'sudo dpkg --configure -a' to fix the problem."
@@ -548,64 +548,60 @@ msgstr ""
 "Interrupção do dpkg detetada. Clique no botão 'Corrigir' ou\n"
 "execute manualmente 'sudo dpkg --configure -a' para corrigir o problema."
 
-#: src/MainWindow.py:1544
+#: src/MainWindow.py:1500
 msgid "The process is in progress. Please wait..."
 msgstr "O processo está em andamento. Aguarde..."
 
-#: src/MainWindow.py:1782
+#: src/MainWindow.py:1742
 msgid "Clear All Selections"
 msgstr "Limpar todas as seleções"
 
-#: src/MainWindow.py:1848
+#: src/MainWindow.py:1801
 msgid "System is Broken"
 msgstr "O sistema está corrompido"
 
-#: src/MainWindow.py:1863
+#: src/MainWindow.py:1816
 msgid "Software Update"
 msgstr "Atualização de software"
 
-#: src/MainWindow.py:1864
+#: src/MainWindow.py:1817
 msgid "There are {} software updates available."
 msgstr "Existem {} atualizações de software disponíveis."
 
-#: src/MainWindow.py:1866
+#: src/MainWindow.py:1819
 msgid "There is {} software update available."
 msgstr "Existe {} atualização de software disponível."
 
-#: src/MainWindow.py:1878
+#: src/MainWindow.py:1831
 msgid "Repository Connection Error"
 msgstr "Erro de ligação ao repositório"
 
-#: src/MainWindow.py:1888
+#: src/MainWindow.py:1838
 msgid "You have removable residual packages."
 msgstr "Tem pacotes residuais removíveis."
 
-#: src/MainWindow.py:1902
+#: src/MainWindow.py:1852
 msgid "{} Updates Pending"
 msgstr "{} atualizações pendentes"
 
-#: src/MainWindow.py:1904
+#: src/MainWindow.py:1854
 msgid "{} Update Pending"
 msgstr "{} atualização pendente"
 
-#: src/MainWindow.py:1927
-msgid "Automatic upgrade started in the background."
-msgstr "A atualização automática foi iniciada em segundo plano."
-
-#: src/MainWindow.py:1968
+#: src/MainWindow.py:1899
 msgid "Upgrade to {}"
 msgstr "Atualizar para {}"
 
-#: src/MainWindow.py:2107
+#: src/MainWindow.py:2038
 msgid "Total Required Size"
 msgstr "Tamanho total necessário"
 
-#: src/MainWindow.py:2278 src/MainWindow.py:2376 src/MainWindow.py:2452
-#: src/MainWindow.py:2544 src/MainWindow.py:2676
+#: src/MainWindow.py:2209 src/MainWindow.py:2307 src/MainWindow.py:2383
+#: src/MainWindow.py:2475 src/MainWindow.py:2557
 msgid "Copy selected text"
 msgstr "Copiar o texto selecionado"
 
-#: src/MainWindow.py:2335
+#: src/MainWindow.py:2266
 msgid ""
 "Only one software management tool is allowed to run at the same time.\n"
 "Please close the other application e.g. 'Update Manager', 'aptitude' or "
@@ -616,40 +612,36 @@ msgstr ""
 "Feche primeiro a outra aplicação, por exemplo, o 'Gestor de atualizações', o "
 "'aptitude' ou o 'Synaptic'."
 
-#: src/MainWindow.py:2344
+#: src/MainWindow.py:2275
 msgid "Process could not be completed."
 msgstr "Não foi possível concluir o processo."
 
-#: src/MainWindow.py:2347 src/MainWindow.py:2598
+#: src/MainWindow.py:2278 src/MainWindow.py:2529
 msgid "Process completed."
 msgstr "Processo concluído."
 
-#: src/MainWindow.py:2350
+#: src/MainWindow.py:2281
 msgid "An error occurred during the process. Please check the output above."
 msgstr ""
 "Ocorreu um erro durante o processo. Por favor, verifique o resultado acima."
 
-#: src/MainWindow.py:2500
+#: src/MainWindow.py:2431
 msgid "The download is complete. You can continue."
 msgstr "A transferência está concluída. Pode continuar."
 
-#: src/MainWindow.py:2513
+#: src/MainWindow.py:2444
 msgid "The download is not completed. Try again."
 msgstr "A transferência não foi concluída. Tente novamente."
 
-#: src/MainWindow.py:2596
+#: src/MainWindow.py:2527
 msgid "Error."
 msgstr "Erro."
 
-#: src/MainWindow.py:2650
-msgid "Automatic upgrade completed."
-msgstr "Atualização automática concluída."
-
-#: src/MainWindow.py:2790
+#: src/MainWindow.py:2672
 msgid "Update"
 msgstr "Atualizar"
 
-#: src/MainWindow.py:2791
+#: src/MainWindow.py:2673
 msgid "Close"
 msgstr "Fechar"
 
@@ -657,41 +649,47 @@ msgstr "Fechar"
 msgid "OK"
 msgstr "OK"
 
-#: src/SysActions.py:485 src/SysActions.py:527
+#: src/AptSourceActions.py:60 src/AptSourceActions.py:112
 msgid "Package Manager Cache is updating, please wait..."
 msgstr "A cache do gestor de pacotes está a ser atualizada, aguarde..."
 
-#: src/SysActions.py:490
+#: src/AptSourceActions.py:76
 msgid "New Sources List"
 msgstr "Nova lista de fontes"
 
-#: src/SysActions.py:491
+#: src/AptSourceActions.py:77
 msgid "Fix sources.list.d"
 msgstr "Correção da sources.list.d"
 
-#: src/SysActions.py:493
+#: src/AptSourceActions.py:79
 msgid "Sources List Dir Remove"
 msgstr "Remoção de Sources List Dir"
 
-#: src/SysActions.py:494
+#: src/AptSourceActions.py:80
 msgid "DPKG Configure State"
 msgstr "Estado de DPKG Configure"
 
-#: src/SysActions.py:495
+#: src/AptSourceActions.py:81
 msgid "Fix Broken State"
 msgstr "Estado de Fix Broken"
 
-#: src/SysActions.py:516
+#: src/AptSourceActions.py:102
 msgid "sources.list.d fix skipped per user request."
 msgstr "Correção da sources.list.d ignorada a pedido do utilizador."
 
-#: src/SysActions.py:534
+#: src/AptSourceActions.py:119
 msgid "dpkgconfigure skipped per user request."
 msgstr "dpkgconfigure ignorado a pedido do utilizador."
 
-#: src/SysActions.py:539
+#: src/AptSourceActions.py:124
 msgid "fixbroken skipped per user request."
 msgstr "fixbroken ignorado a pedido do utilizador."
+
+#~ msgid "Automatic upgrade started in the background."
+#~ msgstr "A atualização automática foi iniciada em segundo plano."
+
+#~ msgid "Automatic upgrade completed."
+#~ msgstr "Atualização automática concluída."
 
 #~ msgid "Interrupt Error"
 #~ msgstr "Erro de interrupção"
