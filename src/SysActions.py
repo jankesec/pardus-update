@@ -6,30 +6,22 @@ Created on Fri Sep 18 14:53:00 2020
 @author: fatih
 """
 import json
+import locale
 import os
-import random
-import string
+import re
 import subprocess
 import sys
-from datetime import datetime
 from pathlib import Path
-from shutil import copy2
 from shutil import rmtree
 
 import apt
 import apt_pkg
-from aptsources import sourceslist as aptsourceslist
-import distro
-import re
-
-import locale
-from locale import gettext as _
 
 locale.bindtextdomain('pardus-update', '/usr/share/locale')
 locale.textdomain('pardus-update')
 
-def main():
 
+def main():
     keep_list = ["firmware-b43-installer", "firmware-b43legacy-installer", "ttf-mscorefonts-installer"]
 
     def control_lock():
@@ -43,15 +35,6 @@ def main():
             return False, msg
         apt_pkg.pkgsystem_unlock()
         return True, msg
-
-    def update():
-        try:
-            cache = apt.Cache()
-            cache.open()
-            cache.update()
-        except Exception as e:
-            print(str(e))
-            subupdate()
 
     def subupdate():
         subprocess.call(["apt", "update"],
@@ -103,10 +86,6 @@ def main():
                 subprocess.call(["apt-mark", "unhold", kp])
 
         sys.exit(result.returncode)
-
-    def fixbroken():
-        subprocess.call(["apt", "install", "--fix-broken", "-yq"],
-                        env={**os.environ, 'DEBIAN_FRONTEND': 'noninteractive'})
 
     def dpkgconfigure():
         subprocess.call(["dpkg", "--configure", "-a"],
@@ -488,8 +467,10 @@ def main():
                 os.system('dbus-send --system --print-reply --dest=org.freedesktop.login1 /org/freedesktop/login1 '
                           '"org.freedesktop.login1.Manager.Reboot" boolean:true')
             else:
-                print("safeupgrade_path: {}, exists: {}".format(safeupgrade_path, os.path.exists(safeupgrade_path)), file=sys.stderr)
-                print("service_path: {}, exists: {}".format(service_path, os.path.exists(service_path)), file=sys.stderr)
+                print("safeupgrade_path: {}, exists: {}".format(safeupgrade_path, os.path.exists(safeupgrade_path)),
+                      file=sys.stderr)
+                print("service_path: {}, exists: {}".format(service_path, os.path.exists(service_path)),
+                      file=sys.stderr)
                 print("systemupdate_path: {}, exists: {}".format(sup_path, os.path.exists(sup_path)), file=sys.stderr)
                 if os.path.exists(sup_path):
                     os.remove(sup_path)
@@ -508,92 +489,6 @@ def main():
         if aptlists == "1":
             rmtree("/var/lib/apt/lists/", ignore_errors=True)
             subupdate()
-
-    def set_source_state(state, line, file_path):
-
-        if state not in ("0", "1"):
-            print("Invalid state parameter.", file=sys.stderr)
-            sys.exit(1)
-
-        print("{}\n\nold: {}\n".format(file_path, line))
-        sources = aptsourceslist.SourcesList()
-        for source in sources.list:
-            try:
-                if source.line.strip() == line and source.file == file_path:
-                    source.set_enabled(state == "1")
-                    print("new: {}\n".format(source.line.strip()))
-                    break
-            except Exception as e:
-                print("{}".format(e))
-                continue
-        sources.save()
-
-        print(_("Package Manager Cache is updating, please wait..."))
-        print("")
-        subupdate()
-
-    def fix_sources(slist_content, fix_slistd, slistd_remove, configure_state, fixbroken_state):
-
-        allowed_flags = {"0", "1"}
-        if not (fix_slistd in allowed_flags and slistd_remove in allowed_flags and
-                configure_state in allowed_flags and fixbroken_state in allowed_flags):
-            print("Invalid state flags provided. Aborting.", file=sys.stderr)
-            sys.exit(1)
-
-        if not is_safe_sources(slist_content):
-            print("Malicious apt source detected. Execution aborted.", file=sys.stderr)
-            sys.exit(1)
-
-        print("{}:\n\n{}".format(_("New Sources List"), slist_content))
-        print("{}: {}\n".format(_("Fix sources.list.d"), fix_slistd))
-        if fix_slistd == "1":
-            print("{}: {}\n".format(_("Sources List Dir Remove"), slistd_remove))
-        print("{}: {}\n".format(_("DPKG Configure State"), configure_state))
-        print("{}: {}\n".format(_("Fix Broken State"), fixbroken_state))
-
-        if fix_slistd == "1":
-            sourceslistd_dir = "/etc/apt/sources.list.d"
-            if os.path.isdir(sourceslistd_dir):
-                if slistd_remove == "0":
-                    sources = aptsourceslist.SourcesList()
-                    for source in sources.list:
-                        try:
-                            source.set_enabled(False)
-                        except Exception as e:
-                            print("{}".format(e))
-                            continue
-                    sources.save()
-                elif slistd_remove == "1":
-                    try:
-                        rmtree(sourceslistd_dir, ignore_errors=True)
-                        Path(sourceslistd_dir).mkdir(parents=True, exist_ok=True)
-                    except Exception as e:
-                        print("{}".format(e))
-        else:
-            print(_("sources.list.d fix skipped per user request."))
-
-
-        sources_list_file = open("/etc/apt/sources.list", "w")
-        sources_list_file.write("{}\n### This section generated by Pardus Update at {} ###\n".format(
-            slist_content, str(datetime.now())))
-        sources_list_file.flush()
-        sources_list_file.close()
-
-        rmtree("/var/lib/apt/lists/", ignore_errors=True)
-        aptclean()
-        print(_("Package Manager Cache is updating, please wait..."))
-        print("")
-        subupdate()
-
-        if configure_state == "1":
-            dpkgconfigure()
-        else:
-            print(_("dpkgconfigure skipped per user request."))
-
-        if fixbroken_state == "1":
-            fixbroken()
-        else:
-            print(_("fixbroken skipped per user request."))
 
     def is_safe_sources(sources_text):
         if not sources_text or not str(sources_text).strip():
@@ -643,7 +538,6 @@ def main():
 
         return valid_packages
 
-
     if len(sys.argv) > 1:
         if sys.argv[1] == "upgrade":
             subupdate()
@@ -663,10 +557,6 @@ def main():
             dpkgconfigure()
         elif sys.argv[1] == "aptclear":
             aptclear(sys.argv[2], sys.argv[3], sys.argv[4])
-        elif sys.argv[1] == "setsourcestate":
-            set_source_state(sys.argv[2], sys.argv[3], sys.argv[4])
-        elif sys.argv[1] == "fixsources":
-            fix_sources(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6])
         else:
             print("unknown argument error")
     else:

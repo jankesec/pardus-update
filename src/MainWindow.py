@@ -1013,7 +1013,7 @@ class MainWindow(object):
 
             GLib.idle_add(self.ui_settings_aptclear_ok_button.set_visible, False)
 
-            command = ["/usr/bin/pkexec", os.path.dirname(os.path.abspath(__file__)) + "/SysActions.py",
+            command = ["/usr/bin/pkexec", os.path.dirname(os.path.abspath(__file__)) + "/AptSourceActions.py",
                        "setsourcestate", "1" if state else "0", switch.name["line"], switch.name["path"]]
             self.settings_vte_start_process(command)
             self.ui_settings_vte_box.set_visible(True)
@@ -1038,7 +1038,7 @@ class MainWindow(object):
 
             GLib.idle_add(self.ui_settings_aptclear_ok_button.set_visible, False)
 
-            command = ["/usr/bin/pkexec", os.path.dirname(os.path.abspath(__file__)) + "/SysActions.py", "fixsources",
+            command = ["/usr/bin/pkexec", os.path.dirname(os.path.abspath(__file__)) + "/AptSourceActions.py", "fixsources",
                        self.user_default_sources_list,
                        "1" if self.ui_settings_fix_slistd_checkbox.get_active() else "0",
                        "1" if self.ui_settings_remove_slistd_radiobutton.get_active() else "0",
@@ -1467,7 +1467,7 @@ class MainWindow(object):
                                                             self.user_distro_id, self.user_distro_version,
                                                             self.user_distro_codename))
             return
-        command = ["/usr/bin/pkexec", os.path.dirname(os.path.abspath(__file__)) + "/SysActions.py", "fixsources",
+        command = ["/usr/bin/pkexec", os.path.dirname(os.path.abspath(__file__)) + "/AptSourceActions.py", "fixsources",
                    self.user_default_sources_list, "1", "1", "1", "1"]
         self.ui_fix_stack.set_visible_child_name("main")
         self.ui_fix_button.set_sensitive(False)
