@@ -526,12 +526,16 @@ def main():
         if not sources_text or not str(sources_text).strip():
             return False
 
+        allowed_signed_by_prefixes = (
+            "/usr/share/keyrings/",
+            "/etc/apt/keyrings/",
+        )
+
         for raw_line in str(sources_text).splitlines():
             line = raw_line.strip()
             if not line or line.startswith("#"):
                 continue
 
-            # Must start with deb or deb-src followed by optional [options] and URI
             m = re.match(r"^deb(-src)?\s+(?:\[(.*?)\]\s+)?([^\s]+)", line)
             if not m:
                 return False
@@ -539,29 +543,35 @@ def main():
             options = m.group(2)
             uri = m.group(3).lower()
 
-            # 1. URI must strictly use http:// or https:// (reject file:, copy:, cdrom:, etc.)
             if not (uri.startswith("http://") or uri.startswith("https://")):
                 return False
 
-            # 2. If options are present [options], verify that no security-weakening options exist
             if options:
-                opt_compact = options.lower().replace(" ", "")
-                disallowed_keywords = [
-                    "trusted",
-                    "allow-insecure",
-                    "allow-downgrade",
-                    "signed-by",
-                    "check-date",
-                    "check-valid-until"
-                ]
-                for kw in disallowed_keywords:
-                    if kw in opt_compact:
-                        return False
+                for token in options.replace(",", " ").split():
+                    if "=" in token:
+                        key, value = token.split("=", 1)
+                    else:
+                        key, value = token, ""
+                    key = key.lower()
+                    value_l = value.lower()
 
-            # 3. Double-check entire line for forbidden protocols or bypass attempts
+                    if key == "trusted":
+                        return False
+                    if key.startswith("allow-insecure") or key.startswith("allow-weak") or key.startswith("allow-downgrade"):
+                        return False
+                    if key in ("check-valid-until", "check-date"):
+                        if value_l in ("false", "no", "0", "off", "disable", "disabled"):
+                            return False
+                        continue
+                    if key == "signed-by":
+                        path = os.path.normpath(value)
+                        if ".." in path.split(os.sep):
+                            return False
+                        if not any(path.startswith(prefix) for prefix in allowed_signed_by_prefixes):
+                            return False
+
             compact_line = line.lower().replace(" ", "")
-            forbidden_schemes = ["file:", "copy:", "cdrom:"]
-            for scheme in forbidden_schemes:
+            for scheme in ("file:", "copy:", "cdrom:"):
                 if scheme in compact_line:
                     return False
 
