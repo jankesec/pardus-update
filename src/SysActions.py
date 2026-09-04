@@ -530,6 +530,16 @@ def main():
             "/usr/share/keyrings/",
             "/etc/apt/keyrings/",
         )
+        allowed_option_keys = {
+            "arch",
+            "lang",
+            "target",
+            "pdiffs",
+            "by-hash",
+            "signed-by",
+            "check-valid-until",
+            "check-date",
+        }
 
         for raw_line in str(sources_text).splitlines():
             line = raw_line.strip()
@@ -547,33 +557,36 @@ def main():
                 return False
 
             if options:
-                for token in options.replace(",", " ").split():
-                    if "=" in token:
-                        key, value = token.split("=", 1)
+                chunks = re.split(r"[,\s]+(?=[A-Za-z0-9-]+=)", options.strip())
+                for chunk in chunks:
+                    chunk = chunk.strip()
+                    if not chunk:
+                        continue
+                    if "=" in chunk:
+                        key, value = chunk.split("=", 1)
                     else:
-                        key, value = token, ""
-                    key = key.lower()
-                    value_l = value.lower()
+                        key, value = chunk, ""
+                    key = key.lower().strip()
+                    value_l = value.lower().strip()
 
-                    if key == "trusted":
-                        return False
-                    if key.startswith("allow-insecure") or key.startswith("allow-weak") or key.startswith("allow-downgrade"):
+                    if key not in allowed_option_keys:
                         return False
                     if key in ("check-valid-until", "check-date"):
                         if value_l in ("false", "no", "0", "off", "disable", "disabled"):
                             return False
                         continue
                     if key == "signed-by":
-                        path = os.path.normpath(value)
-                        if ".." in path.split(os.sep):
-                            return False
-                        if not any(path.startswith(prefix) for prefix in allowed_signed_by_prefixes):
-                            return False
-
-            compact_line = line.lower().replace(" ", "")
-            for scheme in ("file:", "copy:", "cdrom:"):
-                if scheme in compact_line:
-                    return False
+                        for part in value.split(","):
+                            part = part.strip()
+                            if not part:
+                                return False
+                            path = os.path.normpath(part)
+                            if not os.path.isabs(path):
+                                return False
+                            if ".." in path.split(os.sep):
+                                return False
+                            if not any(path.startswith(prefix) for prefix in allowed_signed_by_prefixes):
+                                return False
 
         return True
 
