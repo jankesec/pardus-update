@@ -11,6 +11,7 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 from shutil import rmtree
 
@@ -132,16 +133,45 @@ def main():
         subprocess.call(["apt", "autoremove", "-yq"],
                         env={**os.environ, 'DEBIAN_FRONTEND': 'noninteractive'})
 
+    def write_temp_sources_list(sources_content):
+        run_dir = "/run/pardus-update"
+        if os.path.isdir("/run"):
+            try:
+                os.makedirs(run_dir, mode=0o700, exist_ok=True)
+                tmp_path = os.path.join(run_dir, "tmp-sources.list")
+                if os.path.islink(tmp_path):
+                    os.unlink(tmp_path)
+                with open(tmp_path, "w") as f:
+                    f.write(sources_content)
+                    f.flush()
+                try:
+                    os.chmod(tmp_path, 0o600)
+                except OSError:
+                    pass
+                return tmp_path
+            except OSError:
+                pass
+
+        fd, tmp_path = tempfile.mkstemp(prefix="pardus-update-sources-", suffix=".list")
+        with os.fdopen(fd, "w") as f:
+            f.write(sources_content)
+            f.flush()
+        return tmp_path
+
+    def cleanup_temp_sources_list(tmp_path):
+        if tmp_path and os.path.exists(tmp_path):
+            try:
+                os.unlink(tmp_path)
+            except OSError:
+                pass
+
     def controldistupgrade(sourceslist):
 
         if not is_safe_sources(sourceslist):
             print("Malicious apt source detected. Execution aborted.", file=sys.stderr)
             sys.exit(1)
 
-        sfile = open("/tmp/tmp-sources.list", "w")
-        sfile.write(sourceslist)
-        sfile.flush()
-        sfile.close()
+        tmp_sources_path = write_temp_sources_list(sourceslist)
 
         rc_file = os.path.dirname(os.path.abspath(__file__)) + "/../required_changes_for_upgrade.json"
 
@@ -162,14 +192,15 @@ def main():
         old_sources_list = apt_pkg.config.find("Dir::Etc::sourcelist")
         old_sources_list_d = apt_pkg.config.find("Dir::Etc::sourceparts")
         old_cleanup = apt_pkg.config.find("APT::List-Cleanup")
-        apt_pkg.init_config()
-        apt_pkg.config.set("Dir::Etc::sourcelist", os.path.abspath("/tmp/tmp-sources.list"))
-        apt_pkg.config.set("Dir::Etc::sourceparts", "xxx")
-        apt_pkg.config.set("APT::List-Cleanup", "0")
-        apt_pkg.init_system()
-        cache = apt.Cache()
-        cache.update()
-        cache.open()
+        try:
+            apt_pkg.init_config()
+            apt_pkg.config.set("Dir::Etc::sourcelist", os.path.abspath(tmp_sources_path))
+            apt_pkg.config.set("Dir::Etc::sourceparts", "xxx")
+            apt_pkg.config.set("APT::List-Cleanup", "0")
+            apt_pkg.init_system()
+            cache = apt.Cache()
+            cache.update()
+            cache.open()
 
         try:
             cache.upgrade(True)
@@ -301,10 +332,11 @@ def main():
         json.dump(rcu, changes_file, indent=2)
         changes_file.flush()
         changes_file.close()
-
-        apt_pkg.config.set("Dir::Etc::sourcelist", old_sources_list)
-        apt_pkg.config.set("Dir::Etc::sourceparts", old_sources_list_d)
-        apt_pkg.config.set("APT::List-Cleanup", old_cleanup)
+        finally:
+            cleanup_temp_sources_list(tmp_sources_path)
+            apt_pkg.config.set("Dir::Etc::sourcelist", old_sources_list)
+            apt_pkg.config.set("Dir::Etc::sourceparts", old_sources_list_d)
+            apt_pkg.config.set("APT::List-Cleanup", old_cleanup)
 
     def downupgrade(sourceslist):
 
@@ -314,33 +346,33 @@ def main():
 
         aptclean()
 
-        sfile = open("/tmp/tmp-sources.list", "w")
-        sfile.write(sourceslist)
-        sfile.flush()
-        sfile.close()
-
-        apt_pkg.init_config()
-        apt_pkg.config.set("Dir::Etc::sourcelist", os.path.abspath("/tmp/tmp-sources.list"))
-        apt_pkg.config.set("Dir::Etc::sourceparts", "xxx")
-        apt_pkg.config.set("APT::List-Cleanup", "0")
-        apt_pkg.init_system()
-        cache = apt.Cache()
-        cache.update()
-        cache.open()
+        tmp_sources_path = write_temp_sources_list(sourceslist)
 
         try:
-            cache.upgrade(True)
-        except Exception as error:
-            print("cache.upgrade Error: {}".format(error))
+            apt_pkg.init_config()
+            apt_pkg.config.set("Dir::Etc::sourcelist", os.path.abspath(tmp_sources_path))
+            apt_pkg.config.set("Dir::Etc::sourceparts", "xxx")
+            apt_pkg.config.set("APT::List-Cleanup", "0")
+            apt_pkg.init_system()
+            cache = apt.Cache()
+            cache.update()
+            cache.open()
 
-        for kp in keep_list:
             try:
-                cache[kp].mark_keep()
-            except Exception as e:
-                print("{} not found".format(kp))
-                print("{}".format(e))
+                cache.upgrade(True)
+            except Exception as error:
+                print("cache.upgrade Error: {}".format(error))
 
-        cache.fetch_archives()
+            for kp in keep_list:
+                try:
+                    cache[kp].mark_keep()
+                except Exception as e:
+                    print("{} not found".format(kp))
+                    print("{}".format(e))
+
+            cache.fetch_archives()
+        finally:
+            cleanup_temp_sources_list(tmp_sources_path)
 
         # subprocess.call(["apt", "full-upgrade", "-yqd"],
         #                 env={**os.environ, 'DEBIAN_FRONTEND': 'noninteractive'})
@@ -494,25 +526,43 @@ def main():
         if not sources_text or not str(sources_text).strip():
             return False
 
-        blacklisted_terms = [
-            "trusted=yes", "trusted=true",
-            "allow-insecure",
-            "signed-by=",
-            "file://", "copy://", "cdrom://"
-        ]
-
-        for line in str(sources_text).splitlines():
-
-            line = line.strip()
+        for raw_line in str(sources_text).splitlines():
+            line = raw_line.strip()
             if not line or line.startswith("#"):
                 continue
 
-            if not re.match(r"^deb(-src)?\s+", line):
+            # Must start with deb or deb-src followed by optional [options] and URI
+            m = re.match(r"^deb(-src)?\s+(?:\[(.*?)\]\s+)?([^\s]+)", line)
+            if not m:
                 return False
 
+            options = m.group(2)
+            uri = m.group(3).lower()
+
+            # 1. URI must strictly use http:// or https:// (reject file:, copy:, cdrom:, etc.)
+            if not (uri.startswith("http://") or uri.startswith("https://")):
+                return False
+
+            # 2. If options are present [options], verify that no security-weakening options exist
+            if options:
+                opt_compact = options.lower().replace(" ", "")
+                disallowed_keywords = [
+                    "trusted",
+                    "allow-insecure",
+                    "allow-downgrade",
+                    "signed-by",
+                    "check-date",
+                    "check-valid-until"
+                ]
+                for kw in disallowed_keywords:
+                    if kw in opt_compact:
+                        return False
+
+            # 3. Double-check entire line for forbidden protocols or bypass attempts
             compact_line = line.lower().replace(" ", "")
-            for term in blacklisted_terms:
-                if term.replace(" ", "") in compact_line:
+            forbidden_schemes = ["file:", "copy:", "cdrom:"]
+            for scheme in forbidden_schemes:
+                if scheme in compact_line:
                     return False
 
         return True

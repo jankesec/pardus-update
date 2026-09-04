@@ -127,25 +127,43 @@ def main():
         if not sources_text or not str(sources_text).strip():
             return False
 
-        blacklisted_terms = [
-            "trusted=yes", "trusted=true",
-            "allow-insecure",
-            "signed-by=",
-            "file://", "copy://", "cdrom://"
-        ]
-
-        for line in str(sources_text).splitlines():
-
-            line = line.strip()
+        for raw_line in str(sources_text).splitlines():
+            line = raw_line.strip()
             if not line or line.startswith("#"):
                 continue
 
-            if not re.match(r"^deb(-src)?\s+", line):
+            # Must start with deb or deb-src followed by optional [options] and URI
+            m = re.match(r"^deb(-src)?\s+(?:\[(.*?)\]\s+)?([^\s]+)", line)
+            if not m:
                 return False
 
+            options = m.group(2)
+            uri = m.group(3).lower()
+
+            # 1. URI must strictly use http:// or https:// (reject file:, copy:, cdrom:, etc.)
+            if not (uri.startswith("http://") or uri.startswith("https://")):
+                return False
+
+            # 2. If options are present [options], verify that no security-weakening options exist
+            if options:
+                opt_compact = options.lower().replace(" ", "")
+                disallowed_keywords = [
+                    "trusted",
+                    "allow-insecure",
+                    "allow-downgrade",
+                    "signed-by",
+                    "check-date",
+                    "check-valid-until"
+                ]
+                for kw in disallowed_keywords:
+                    if kw in opt_compact:
+                        return False
+
+            # 3. Double-check entire line for forbidden protocols or bypass attempts
             compact_line = line.lower().replace(" ", "")
-            for term in blacklisted_terms:
-                if term.replace(" ", "") in compact_line:
+            forbidden_schemes = ["file:", "copy:", "cdrom:"]
+            for scheme in forbidden_schemes:
+                if scheme in compact_line:
                     return False
 
         return True
